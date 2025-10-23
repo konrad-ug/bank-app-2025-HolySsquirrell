@@ -3,11 +3,11 @@
 
 ## Author:
 name:
-
+Marcel
 surname:
-
+Jaroszewicz
 group:
-
+II
 ## How to start the app
 
 
