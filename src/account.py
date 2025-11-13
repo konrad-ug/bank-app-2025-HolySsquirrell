@@ -24,7 +24,3 @@ class Account:
         else:
             self.balance =- amount
             return
-    #def incoming_transfer(self,acc,amount)
-
-
-
