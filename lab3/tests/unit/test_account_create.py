@@ -1,4 +1,4 @@
-from src.account import Account
+from lab3.src.account import Account
 
 
 class TestTransfers:

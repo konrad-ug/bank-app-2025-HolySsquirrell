@@ -1,4 +1,4 @@
-from src.account import Account
+from lab2.src.account import Account
 
 
 class TestAccount:
