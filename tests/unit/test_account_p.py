@@ -1,7 +1,11 @@
 from src.accountPersonal import AccountPersonal
-
+import pytest
 
 class TestAccount:
+    @pytest.fixture(autouse=True, scope="function")
+    def account(self):
+        self.account = AccountPersonal('Joh',"Does",'22345678901','XYZ')
+
     def test_account_creation(self):
         account = AccountPersonal("John", "Doe",'12345678910')
         assert account.balance == 0.0
@@ -47,9 +51,31 @@ class TestAccount:
         
     def test_transfer_out_wrong(self):
         acc = AccountPersonal('John','Skyrim','12345678901')
-        acc.balance = 100.0
-        acc.outgoing_transfer(200.0)
+        self.account.balance = 100.0
+        self.account.outgoing_transfer(200.0)
+        assert self.account.balance == 100.0
+        assert self.account.history == []
+
     def test_transfer_out_correct(self):
-        acc = AccountPersonal('John','Skyrim','12345678901')
-        acc.balance = 300.0
-        acc.outgoing_transfer(200.0)
+        self.account.balance = 300.0
+        self.account.outgoing_transfer(200.0)
+        assert self.account.balance == 100.0
+        assert self.account.history == [-200.0]
+
+    def test_transfer_out_express_correct_with_negative_balance_end(self):
+        self.account.balance = 300.0
+        self.account.outgoing_transfer_express(300.0)
+        assert self.account.balance == -1.0
+        assert self.account.history == [-1.0,-300.0]
+
+    def test_transfer_out_express_wrong(self):
+        self.account.balance = 300.0
+        self.account.outgoing_transfer_express(400.0)
+        assert self.account.balance == 300.0
+        assert self.account.history == []
+    
+    def test_loan_correct(self):
+        self.account.balance = 500.0
+        self.account.history = []
+    
+    

@@ -17,11 +17,25 @@ class TestTransfers:
     def test_transfer_out_wrong(self):
         self.account.balance = 100.0
         self.account.outgoing_transfer(200.0)
+        assert self.account.balance == 100.0
 
     def test_transfer_out_correct(self):
         self.account.balance = 300.0
         self.account.outgoing_transfer(200.0)
         assert self.account.balance == 100.0
+        assert self.account.history == [-200.0]
+
+    def test_transfer_out_express_correct_with_negative_balance_end(self):
+        self.account.balance = 300.0
+        self.account.outgoing_transfer_express(300.0)
+        assert self.account.balance == -1.0
+        assert self.account.history == [-1.0,-300.0]
+
+    def test_transfer_out_express_wrong(self):
+        self.account.balance = 300.0
+        self.account.outgoing_transfer_express(400.0)
+        assert self.account.balance == 300.0
+        assert self.account.history == []
 
     
         
