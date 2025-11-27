@@ -1,26 +1,21 @@
-class Account:
-    def __init__(self, first_name, last_name, pesel, code = ""):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.balance = 0.0 if (self.valid_code(code) or self.is_old_enough(pesel)) else 50.0 
-        self.pesel = pesel if self.is_pesel_valid(pesel) else "Invalid"
+class AccountPersonal:
     
-    def is_pesel_valid(self,pesel):
-        if isinstance(pesel,str) and len(pesel) == 11:
-            return True
-        return False
-    def valid_code(self, code):
-        if isinstance(code,str) and len(code) == 3: 
-            return False
-        return True 
-    def is_old_enough(self,pesel):
-        peselInt = int(pesel)
-        if (peselInt > 60999999999 or peselInt < 25000000000):
-            return False
-        return True
+
     def outgoing_transfer(self,amount):
         if (amount > self.balance or amount < 0):
             return
         else:
-            self.balance =- amount
+            self.balance -= amount
+            self.history.append(-amount)
             return
+    def outgoing_transfer_express(self,amount):
+        if (amount > self.balance or amount < 0):
+            return
+        else:
+            self.balance -= amount
+            self.history.append(-amount)
+            
+            self.balance -= self.fee
+            self.history.append(-self.fee)
+            return
+
