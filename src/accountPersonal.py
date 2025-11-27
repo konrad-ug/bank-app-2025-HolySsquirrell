@@ -6,7 +6,8 @@ class AccountPersonal(AccountPersonal):
         self.last_name = last_name
         self.balance = 0.0 if (self.valid_code(code) or self.is_old_enough(pesel)) else 50.0 
         self.pesel = pesel if self.is_pesel_valid(pesel) else "Invalid"
-        self.fee = 1.0 
+        self.fee = 1.0
+        self.history = [] 
     
     def is_pesel_valid(self,pesel):
         if isinstance(pesel,str) and len(pesel) == 11:
