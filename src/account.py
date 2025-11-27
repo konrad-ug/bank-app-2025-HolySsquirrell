@@ -1,6 +1,4 @@
-class AccountPersonal:
-    
-
+class Account:
     def outgoing_transfer(self,amount):
         if (amount > self.balance or amount < 0):
             return
