@@ -25,33 +25,32 @@ class AccountPersonal(AccountPersonal):
     
 
     def submit_for_loan(self,amount):
-        def not_valid_for_loan(self,amount):
+        def not_valid_for_loan(self):
             hist = self.history
             #Suma ostatnich pięciu transakcji powinna być większa niż kwota wnioskowanego kredytu.
-            def suma_5(self):
+            def suma_5():
                 suma = 0
-                for i in range(0,5):
-                    suma += hist[i]
+                for i in range(1,6):
+                    suma += hist[-i]
                 return suma
             #Ostatnie trzy zaksięgowane transakcje powinny być transakcjami wpłaty
-            def pos_3(self):
-                if hist[0] < 0 or hist[1] < 0 or hist[2] < 0:
+            def pos_3():
+                if hist[-1] < 0 or hist[-2] < 0 or hist[-3] < 0:
                     return True
                 else: 
                     return False
             #konto musi mieć co najmniej pięć transakcji
             if (len(hist) < 5 or suma_5() < amount) or pos_3():
-                return False
-            else:
                 return True
-            if len(hist) < 5:
+            else:
                 return False
-        
-        if not_valid_for_loan(amount):
-            return False
+
+        if not_valid_for_loan(self):
+            return 
         else:
             self.balance += amount
-            return True
+            self.history.append(amount)
+            return 
         
 #1. Ostatnie trzy zaksięgowane transakcje powinny być transakcjami wpłaty, lub
 #2. Suma ostatnich pięciu transakcji (konto musi mieć co najmniej pięć transakcji) powinna

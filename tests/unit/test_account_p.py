@@ -5,6 +5,7 @@ class TestAccount:
     @pytest.fixture(autouse=True, scope="function")
     def account(self):
         self.account = AccountPersonal('Joh',"Does",'22345678901','XYZ')
+        self.account.balance = 0
 
     def test_account_creation(self):
         account = AccountPersonal("John", "Doe",'12345678910')
@@ -74,8 +75,24 @@ class TestAccount:
         assert self.account.balance == 300.0
         assert self.account.history == []
     
-    def test_loan_correct(self):
-        self.account.balance = 500.0
-        self.account.history = []
+    def test_loan_balance_history_less_than_credit(self):
+        self.account.history = [0.0,200.0,300.0,-150.0,-200.0,-100.0]
+        self.account.submit_for_loan(500.0)
+        assert self.account.balance == 0
     
+    def test_loan_balance_history_last_3_positive(self):
+        self.account.history = [0.0,10000.0,300.0,-150.0,-200.0,-100.0]
+        self.account.submit_for_loan(500.0)
+        assert self.account.balance == 0
+
+    def test_loan_balance_history_less_5_history(self):
+        self.account.history = [0.0,10000.0,300.0]
+        self.account.submit_for_loan(500.0)
+        assert self.account.balance == 0
+
+    def test_loan_balance_all_correct(self):
+        self.account.history = [0.0,10000.0,300.0,200.0,100.0]
+        self.account.submit_for_loan(500.0)
+        assert self.account.balance == 500.0
+        assert self.account.history == [0.0,10000.0,300.0,200.0,100.0,500.0]
     
