@@ -66,7 +66,7 @@ class TestAccount:
         self.account.balance = 300.0
         self.account.outgoing_transfer_express(300.0)
         assert self.account.balance == -1.0
-        assert self.account.history == [-1.0,-300.0]
+        assert self.account.history == [-300.0,-1.0]
 
     def test_transfer_out_express_wrong(self):
         self.account.balance = 300.0

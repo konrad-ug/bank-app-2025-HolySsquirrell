@@ -1,6 +1,4 @@
 class AccountPersonal:
-    def __init__(self):
-        self.history = []
     
 
     def outgoing_transfer(self,amount):
@@ -8,6 +6,7 @@ class AccountPersonal:
             return
         else:
             self.balance -= amount
+            self.history.append(-amount)
             return
     def outgoing_transfer_express(self,amount):
         if (amount > self.balance or amount < 0):
@@ -15,6 +14,7 @@ class AccountPersonal:
         else:
             self.balance -= amount
             self.history.append(-amount)
+            
             self.balance -= self.fee
             self.history.append(-self.fee)
             return
