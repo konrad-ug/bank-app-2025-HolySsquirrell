@@ -36,6 +36,25 @@ class TestTransfers:
         self.account.outgoing_transfer_express(400.0)
         assert self.account.balance == 300.0
         assert self.account.history == []
+    
+    def test_loan_no_zus(self):
+        self.account.history = []
+        self.account.balance = 50000.0
+        self.account.take_loan(400.0)
+        assert self.account.balance == 50000.0
+    
+    def test_loan_not_enough_balance(self):
+        self.account.history = [-1775.0]
+        self.account.balance = 500.0
+        self.account.take_loan(400.0)
+        assert self.account.balance == 500.0
+
+    def test_loan_all_correct(self):
+        self.account.history = [-1775.0]
+        self.account.balance = 1000.0
+        self.account.take_loan(400.0)
+        assert self.account.balance == 1400.0
+        assert self.account.history == [-1775.0,400]
 
 
 

@@ -1,6 +1,6 @@
-from src.account import AccountPersonal
+from src.account import Account
 
-class AccountPersonal(AccountPersonal):
+class AccountPersonal(Account):
     def __init__(self, first_name, last_name, pesel, code = ""):
         self.first_name = first_name
         self.last_name = last_name
