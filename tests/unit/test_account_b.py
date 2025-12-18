@@ -6,55 +6,58 @@ class TestTransfers:
     def account(self):
         self.account = AccountBusiness("tesla","8421577646")
 
-    def test_correct_nip(self):
-        account = AccountBusiness("tesla","8421577646")
-        assert account.nip == "8421577646"
+    #---------------------------------------------------------------------------#
 
-    def test_wrong_nip(self):
-        account = AccountBusiness("tesla","84215776")
-        assert account.nip == "Invalid"
-    
-    def test_transfer_out_wrong(self):
-        self.account.balance = 100.0
-        self.account.outgoing_transfer(200.0)
-        assert self.account.balance == 100.0
+    @pytest.mark.parametrize("Name,Nip,expected", 
+        [
+            ("tesla","8421577646","8421577646"),
+            ("tesla","84215776","Invalid"),
+        ])
+    def test_nip(self,Name,Nip,expected):
+        account = AccountBusiness(Name,Nip)
+        assert account.nip == expected
+        
+    #---------------------------------------------------------------------------#
 
-    def test_transfer_out_correct(self):
-        self.account.balance = 300.0
-        self.account.outgoing_transfer(200.0)
-        assert self.account.balance == 100.0
-        assert self.account.history == [-200.0]
+    @pytest.mark.parametrize("balance,out,expectedB,expectedH", 
+        [
+            (100.0,200.0,100.0,[]),
+            (300.0,200.0,100.0,[-200.0]),
+        ])
+    def test_transfer(self,balance,out,expectedB,expectedH):
+        self.account.balance = balance
+        self.account.outgoing_transfer(out)
+        assert self.account.balance == expectedB
+        assert self.account.history == expectedH
 
-    def test_transfer_out_express_correct_with_negative_balance_end(self):
-        self.account.balance = 300.0
-        self.account.outgoing_transfer_express(300.0)
-        assert self.account.balance == -5.0
-        assert self.account.history == [-300.0,-5.0]
+    #---------------------------------------------------------------------------#
 
-    def test_transfer_out_express_wrong(self):
-        self.account.balance = 300.0
-        self.account.outgoing_transfer_express(400.0)
-        assert self.account.balance == 300.0
-        assert self.account.history == []
-    
-    def test_loan_no_zus(self):
-        self.account.history = []
-        self.account.balance = 50000.0
-        self.account.take_loan(400.0)
-        assert self.account.balance == 50000.0
-    
-    def test_loan_not_enough_balance(self):
-        self.account.history = [-1775.0]
-        self.account.balance = 500.0
-        self.account.take_loan(400.0)
-        assert self.account.balance == 500.0
+    @pytest.mark.parametrize("balance,out,expectedB,expectedH", 
+        [
+            (300.0,300.0,-5.0,[-300.0,-5.0]),
+            (300.0,400.0,300.0,[]),
+        ])
+    def test_transfer_express(self,balance,out,expectedB,expectedH):
+        self.account.balance = balance
+        self.account.outgoing_transfer_express(out)
+        assert self.account.balance == expectedB
+        assert self.account.history == expectedH
 
-    def test_loan_all_correct(self):
-        self.account.history = [-1775.0]
-        self.account.balance = 1000.0
-        self.account.take_loan(400.0)
-        assert self.account.balance == 1400.0
-        assert self.account.history == [-1775.0,400]
+    #---------------------------------------------------------------------------#
+
+    @pytest.mark.parametrize("history,balance,loan,expectedB,expectedH", 
+        [
+            ([],50000.0,400.0,50000.0,[]),
+            ([-1775.0],500.0,400.0,500.0,[-1775.0]),
+            ([-1775.0],1000.0,400.0,1400.0,[-1775.0,400])
+        ])
+    def test_loan_tests(self,history,balance,loan,expectedB,expectedH):
+        self.account.history = history
+        self.account.balance = balance
+        self.account.take_loan(loan)
+        assert self.account.balance == expectedB
+        assert self.account.history == expectedH
+
 
 
 

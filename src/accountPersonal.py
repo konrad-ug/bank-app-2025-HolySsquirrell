@@ -56,3 +56,22 @@ class AccountPersonal(Account):
 #2. Suma ostatnich pięciu transakcji (konto musi mieć co najmniej pięć transakcji) powinna
 #być większa niż kwota wnioskowanego kredytu.
 #if (((hist[1]+hist[2]+hist[3]+hist[4]+hist[0]) < amount) or hist[0] < 0 or hist[1] < 0 or hist[2] < 0 or len(hist) < 5)
+
+class AccountRegistry:
+    def __init__(self):
+        self.accounts = []
+    
+    def add_account(self, account: AccountPersonal):
+        self.accounts.append(account)
+        return
+    
+    def search_account(self,id_pesel):
+        searched = None
+        for i in self.accounts:
+            if i.pesel == id_pesel:
+                searched = i
+        return searched
+    
+    def return_all_accs(self):
+        return self.accounts
+        
