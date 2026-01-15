@@ -6,7 +6,7 @@ from app.api import app, registry
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
-    registry.accounts.clear()  # reset stanu przed KAŻDYM testem
+    registry.accounts.clear()
 
     with app.test_client() as client:
         yield client
@@ -21,6 +21,26 @@ def test_create_account(client):
 
     assert response.status_code == 201
     assert response.get_json()["message"] == "Account created"
+
+def test_create_account_duplicate_pesel(client):
+    pesel = "11122334455"
+
+    response = client.post("/api/accounts", json={
+        "name": "Lars",
+        "surname": "Ulrich",
+        "pesel": pesel
+    })
+    assert response.status_code == 201
+
+    response = client.post("/api/accounts", json={
+        "name": "Kirk",
+        "surname": "Hammett",
+        "pesel": pesel
+    })
+    assert response.status_code == 409
+    data = response.get_json()
+    assert data["error"] == "Account with this PESEL already exists"
+
 
 
 def test_get_account_by_pesel(client):
