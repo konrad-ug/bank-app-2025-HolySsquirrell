@@ -107,3 +107,55 @@ def test_delete_account(client):
 
     get_response = client.get(f"/api/accounts/{pesel}")
     assert get_response.status_code == 404
+
+@pytest.fixture
+def account_with_balance(client):
+    pesel = "55566778899"
+    client.post("/api/accounts", json={"name": "Test", "surname": "User", "pesel": pesel})
+    client.post(f"/api/accounts/{pesel}/transfer", json={"amount": 1000, "type": "incoming"})
+    return pesel
+
+def test_transfer_incoming(client, account_with_balance):
+    response = client.post(f"/api/accounts/{account_with_balance}/transfer", json={
+        "amount": 500,
+        "type": "incoming"
+    })
+    assert response.status_code == 200
+    data = client.get(f"/api/accounts/{account_with_balance}").get_json()
+    assert data["balance"] == 1500  
+
+def test_transfer_outgoing_success(client, account_with_balance):
+    response = client.post(f"/api/accounts/{account_with_balance}/transfer", json={
+        "amount": 300,
+        "type": "outgoing"
+    })
+    assert response.status_code == 200
+    data = client.get(f"/api/accounts/{account_with_balance}").get_json()
+    assert data["balance"] == 700  
+
+def test_transfer_outgoing_insufficient(client):
+    pesel = "66677889900"
+    client.post("/api/accounts", json={"name": "Low", "surname": "Balance", "pesel": pesel})
+    response = client.post(f"/api/accounts/{pesel}/transfer", json={
+        "amount": 100,
+        "type": "outgoing"
+    })
+    assert response.status_code == 422
+    assert response.get_json()["error"] == "Insufficient funds"
+
+def test_transfer_express(client, account_with_balance):
+    response = client.post(f"/api/accounts/{account_with_balance}/transfer", json={
+        "amount": 200,
+        "type": "express"
+    })
+    assert response.status_code == 200
+    data = client.get(f"/api/accounts/{account_with_balance}").get_json()
+    assert data["balance"] == 1200  
+
+def test_transfer_unknown_type(client, account_with_balance):
+    response = client.post(f"/api/accounts/{account_with_balance}/transfer", json={
+        "amount": 50,
+        "type": "invalid"
+    })
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Unknown transfer type"
