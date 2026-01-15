@@ -1,14 +1,18 @@
 class Account:
-    def outgoing_transfer(self,amount):
-        if (amount > self.balance or amount < 0):
+    def incoming_transfer(self,amount): 
+        if amount>0: 
+            self.balance+= amount
+            self.history.append(amount)
             return
+    
+    def outgoing_transfer(self,amount):
+        if (amount > self.balance or amount < 0): return;
         else:
             self.balance -= amount
             self.history.append(-amount)
             return
     def outgoing_transfer_express(self,amount):
-        if (amount > self.balance or amount < 0):
-            return
+        if (amount > self.balance or amount < 0): return;
         else:
             self.balance -= amount
             self.history.append(-amount)
@@ -16,4 +20,3 @@ class Account:
             self.balance -= self.fee
             self.history.append(-self.fee)
             return
-

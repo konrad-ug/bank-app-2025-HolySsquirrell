@@ -1,11 +1,11 @@
 from src.accountPersonal import AccountPersonal
-from src.accountPersonal import AccountRegistry
+#from src.accountPersonal import AccountRegistry
 import pytest
 
 class TestAccount:
     @pytest.fixture(autouse=True, scope="function")
     def account(self):
-        self.account = AccountPersonal('Joh',"Does",'22345678901','XYZ')
+        self.account = AccountPersonal('Joh',"Does",'22345678901','PROM_XYZ')
         self.account.balance = 0
 
     #---------------------------------------------------------------------------#
@@ -34,11 +34,12 @@ class TestAccount:
     @pytest.mark.parametrize("Name,Surname,Pesel,Code,expected",
     [
         ("John", "Doe",'12345678910',None,0),
-        ('Joh',"Does",'123456789011','XYZ',50),
+        ('Joh',"Does",'123456789011','PROM_XYZ',50),
         ('Joh',"Does",'123456789011','XY',0),
-        ('Joh',"Does",'32345678901','XYZ',0),
-        ('Joh',"Does",'22345678901','XYZ',50),
-        ('Joh',"Does",'92345678901','XYZ',50)
+        ('Joh',"Does",'32345678901','PROM_XYZ',0),
+        ('Joh',"Does",'22345678901','PROM_XYZ',50),
+        ('Joh',"Does",'92345678901','PROM_XYZ',50),
+        ('Joh',"Does",'92345678901','PRpM_XYZ',0)
     ])
     def test_promo_code(self,Name,Surname,Pesel,Code,expected):
         acc = AccountPersonal(Name,Surname,Pesel,Code)
@@ -85,8 +86,17 @@ class TestAccount:
         assert self.account.balance == expected
 
     #---------------------------------------------------------------------------#
+    
+    @pytest.mark.parametrize("balance,inside,expectedB,expectedH", 
+        [
+            (300.0,300.0,600.0,[300.0])
+        ])
+    def test_transfer_incoming(self,balance,inside,expectedB,expectedH):
+        self.account.balance = balance
+        self.account.incoming_transfer(inside)
+        assert self.account.balance == expectedB
+        assert self.account.history == expectedH
+    
+    #---------------------------------------------------------------------------#
+    
 
-class TestAccountRegistry:
-    @pytest.fixture(autouse=True, scope="function")
-    def accountRegistry(self):
-        self.accountRegistry = AccountRegistry()
