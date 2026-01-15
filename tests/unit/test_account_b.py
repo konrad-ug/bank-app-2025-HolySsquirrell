@@ -57,6 +57,20 @@ class TestTransfers:
         self.account.take_loan(loan)
         assert self.account.balance == expectedB
         assert self.account.history == expectedH
+    
+    #---------------------------------------------------------------------------#
+    
+    @pytest.mark.parametrize("balance,inside,expectedB,expectedH", 
+        [
+            (300.0,300.0,600.0,[300.0])
+        ])
+    def test_transfer_incoming(self,balance,inside,expectedB,expectedH):
+        self.account.balance = balance
+        self.account.incoming_transfer(inside)
+        assert self.account.balance == expectedB
+        assert self.account.history == expectedH
+    
+    #---------------------------------------------------------------------------#
 
 
 

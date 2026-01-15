@@ -13,10 +13,12 @@ class AccountPersonal(Account):
         if isinstance(pesel,str) and len(pesel) == 11:
             return True
         return False
+    
     def valid_code(self, code):
-        if isinstance(code,str) and len(code) == 3: 
+        if isinstance(code,str) and len(code) == 8 and code[:5]=="PROM_": 
             return False
         return True 
+    
     def is_old_enough(self,pesel):
         peselInt = int(pesel)
         if (peselInt > 60999999999 or peselInt < 25000000000):
@@ -57,21 +59,4 @@ class AccountPersonal(Account):
 #być większa niż kwota wnioskowanego kredytu.
 #if (((hist[1]+hist[2]+hist[3]+hist[4]+hist[0]) < amount) or hist[0] < 0 or hist[1] < 0 or hist[2] < 0 or len(hist) < 5)
 
-class AccountRegistry:
-    def __init__(self):
-        self.accounts = []
-    
-    def add_account(self, account: AccountPersonal):
-        self.accounts.append(account)
-        return
-    
-    def search_account(self,id_pesel):
-        searched = None
-        for i in self.accounts:
-            if i.pesel == id_pesel:
-                searched = i
-        return searched
-    
-    def return_all_accs(self):
-        return self.accounts
         
