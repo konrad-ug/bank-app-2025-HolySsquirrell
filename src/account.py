@@ -12,7 +12,8 @@ class Account:
             self.history.append(-amount)
             return
     def outgoing_transfer_express(self,amount):
-        if (amount > self.balance or amount < 0): return;
+        if (amount > self.balance or amount < 0): 
+            return
         else:
             self.balance -= amount
             self.history.append(-amount)

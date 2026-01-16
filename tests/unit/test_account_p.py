@@ -1,5 +1,4 @@
 from src.accountPersonal import AccountPersonal
-#from src.accountPersonal import AccountRegistry
 import pytest
 
 class TestAccount:
@@ -99,4 +98,37 @@ class TestAccount:
     
     #---------------------------------------------------------------------------#
     
+    def test_send_history_email_personal_success(self, mocker):
+        self.account.history = [100, -1, 500]
+
+        send_mock = mocker.patch(
+            "src.accountPersonal.SMTPClient.send",
+            return_value=True
+        )
+
+        result = self.account.send_history_via_email("jan@test.pl")
+
+        assert result is True
+        send_mock.assert_called_once()
+
+        subject, text, email = send_mock.call_args[0]
+        assert subject.startswith("Account Transfer History")
+        assert text == "Personal account history: [100, -1, 500]"
+        assert email == "jan@test.pl"
+    
+    #---------------------------------------------------------------------------#
+
+    def test_send_history_email_personal_failure(self, mocker):
+        self.account.history = []
+
+        mocker.patch(
+            "src.accountPersonal.SMTPClient.send",
+            return_value=False
+        )
+
+        result = self.account.send_history_via_email("jan@test.pl")
+
+        assert result is False
+    
+    #---------------------------------------------------------------------------#
 
