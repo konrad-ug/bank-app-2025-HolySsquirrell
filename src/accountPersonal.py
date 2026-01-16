@@ -1,4 +1,6 @@
 from src.account import Account
+from datetime import date
+from src.smtp.smtp import SMTPClient
 
 class AccountPersonal(Account):
     def __init__(self, first_name, last_name, pesel, code = ""):
@@ -52,7 +54,14 @@ class AccountPersonal(Account):
         else:
             self.balance += amount
             self.history.append(amount)
-            return 
+            return
+    
+    def send_history_via_email(self, email_address: str) -> bool:
+        today = date.today().strftime("%Y-%m-%d")
+        subject = f"Account Transfer History {today}"
+        text = f"Personal account history: {self.history}"
+
+        return SMTPClient.send(subject, text, email_address)
         
 #1. Ostatnie trzy zaksięgowane transakcje powinny być transakcjami wpłaty, lub
 #2. Suma ostatnich pięciu transakcji (konto musi mieć co najmniej pięć transakcji) powinna

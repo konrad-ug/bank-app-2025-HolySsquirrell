@@ -1,6 +1,7 @@
 import os
 import requests
 from datetime import date
+from src.smtp.smtp import SMTPClient
 from src.account import Account
 
 class AccountBusiness(Account):
@@ -63,3 +64,10 @@ class AccountBusiness(Account):
             print("Error contacting MF API:", e)
 
         return False
+    
+    def send_history_via_email(self, email_address: str) -> bool:
+        today = date.today().strftime("%Y-%m-%d")
+        subject = f"Account Transfer History {today}"
+        text = f"Company account history: {self.history}"
+
+        return SMTPClient.send(subject, text, email_address)
