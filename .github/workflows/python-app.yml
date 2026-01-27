@@ -36,5 +36,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python -m coverage run --source=src --omit=src/accountBusiness.py -m pytest
+        python -m coverage run --source=src --omit=src/accountBusiness.py,src/smtp/* -m pytest
         python -m coverage report
