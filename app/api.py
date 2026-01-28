@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from src.accountPersonal import AccountPersonal
 from src.accountRegistry import AccountRegistry
+from src.repository import MongoAccountsRepository
 
 app = Flask(__name__)
 registry = AccountRegistry()
@@ -131,6 +132,20 @@ def transfer_between_accounts():
     receiver.history.append(amount)
 
     return jsonify({"message": "Transfer completed"}), 200
+
+mongo_repo = MongoAccountsRepository()
+
+@app.route("/api/accounts/save", methods=['POST'])
+def save_accounts():
+    accounts = registry.return_all_accs()
+    mongo_repo.save_all(accounts)
+    return {"message": "Accounts saved to DB"}, 200
+
+@app.route("/api/accounts/load", methods=['POST'])
+def load_accounts():
+    global registry
+    registry = mongo_repo.load_all()
+    return {"message": "Accounts loaded from DB"}, 200
 
 
 if __name__ == "__main__":

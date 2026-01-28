@@ -62,6 +62,15 @@ class AccountPersonal(Account):
         text = f"Personal account history: {self.history}"
 
         return SMTPClient.send(subject, text, email_address)
+    
+    def to_dict(self):
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "pesel": self.pesel,
+            "balance": self.balance,
+            "history": self.history
+        }
         
 #1. Ostatnie trzy zaksięgowane transakcje powinny być transakcjami wpłaty, lub
 #2. Suma ostatnich pięciu transakcji (konto musi mieć co najmniej pięć transakcji) powinna

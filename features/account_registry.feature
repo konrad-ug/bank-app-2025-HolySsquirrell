@@ -47,3 +47,12 @@ When I transfer "100" from "11111111111" to "22222222222"
 Then Account "11111111111" balance equals "100"
 And Account "22222222222" balance equals "100"
 
+Scenario: Save and load accounts from DB
+Given Account registry is empty
+And I create an account using name: "test", last name: "user", pesel: "12345678901"
+When I save all accounts to DB
+And I delete account with pesel: "12345678901"
+Then Number of accounts in registry equals: "0"
+When I load all accounts from DB
+Then Number of accounts in registry equals: "1"
+And Account with pesel "12345678901" exists in registry
