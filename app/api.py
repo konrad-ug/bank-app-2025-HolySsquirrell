@@ -47,6 +47,7 @@ def get_account_by_pesel(pesel):
     }), 200
 
 @app.route("/api/accounts/<pesel>", methods=['PATCH'])
+@app.route("/api/accounts/<pesel>", methods=['PATCH'])
 def update_account(pesel):
     data = request.get_json()
     account = registry.search_account(pesel)
@@ -56,10 +57,15 @@ def update_account(pesel):
 
     if "name" in data:
         account.first_name = data["name"]
+
     if "surname" in data:
         account.last_name = data["surname"]
 
+    if "balance" in data:  
+        account.balance = float(data["balance"])
+
     return jsonify({"message": "Account updated"}), 200
+
 
 @app.route("/api/accounts/<pesel>", methods=['DELETE'])
 def delete_account(pesel):
@@ -100,5 +106,34 @@ def transfer(pesel):
         account.balance += amount
         account.history.append(amount)
         return jsonify({"message": "Zlecenie przyjęto do realizacji"}), 200
+
+@app.route("/api/transfers", methods=["POST"])
+def transfer_between_accounts():
+    data = request.get_json()
+
+    sender_pesel = data["from"]
+    receiver_pesel = data["to"]
+    amount = float(data["amount"])
+
+    sender = registry.search_account(sender_pesel)
+    receiver = registry.search_account(receiver_pesel)
+
+    if not sender or not receiver:
+        return jsonify({"error": "Account not found"}), 404
+
+    if sender.balance < amount:
+        return jsonify({"error": "Insufficient funds"}), 400
+
+    sender.balance -= amount
+    receiver.balance += amount
+
+    sender.history.append(-amount)
+    receiver.history.append(amount)
+
+    return jsonify({"message": "Transfer completed"}), 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 
