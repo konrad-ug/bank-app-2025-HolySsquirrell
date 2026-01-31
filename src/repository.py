@@ -27,51 +27,66 @@ class MongoAccountsRepository:
             pass
 
 
-    def save_all(self, accounts):
-        if self.use_memory:
-            MongoAccountsRepository._memory_storage = [
-                {
+        def save_all(self, accounts):
+            if self._collection is None:
+                MongoAccountsRepository._memory_storage = [
+                    {
+                        "first_name": acc.first_name,
+                        "last_name": acc.last_name,
+                        "pesel": acc.pesel,
+                        "balance": acc.balance,
+                        "history": acc.history
+                    }
+                    for acc in accounts
+                ]
+                return
+    
+            self._collection.delete_many({})
+            for acc in accounts:
+                self._collection.update_one(
+                    {"pesel": acc.pesel},
+                    {"$set": {
+                        "first_name": acc.first_name,
+                        "last_name": acc.last_name,
+                        "pesel": acc.pesel,
+                        "balance": acc.balance,
+                        "history": acc.history
+                    }},
+                    upsert=True
+                )
+    
+        
+            self._collection.delete_many({})
+            for acc in accounts:
+                self._collection.insert_one({
                     "first_name": acc.first_name,
                     "last_name": acc.last_name,
                     "pesel": acc.pesel,
                     "balance": acc.balance,
                     "history": acc.history
-                }
-                for acc in accounts
-            ]
-            return
-    
-        self._collection.delete_many({})
-        for acc in accounts:
-            self._collection.insert_one({
-                "first_name": acc.first_name,
-                "last_name": acc.last_name,
-                "pesel": acc.pesel,
-                "balance": acc.balance,
-                "history": acc.history
-            })
+                })
 
 
 
 
-    def load_all(self):
-        registry = AccountRegistry()
-        registry.accounts.clear()
+        def load_all(self):
+            registry = AccountRegistry()
+            registry.accounts.clear()
     
-        data_source = (
-            MongoAccountsRepository._memory_storage
-            if self.use_memory
-            else self._collection.find({})
-        )
+            if self._collection is None:
+                data = MongoAccountsRepository._memory_storage
+            else:
+                data = self._collection.find({})
     
-        for data in data_source:
-            acc = AccountPersonal(
-                first_name=data["first_name"],
-                last_name=data["last_name"],
-                pesel=data["pesel"]
-            )
-            acc.balance = data["balance"]
-            acc.history = data["history"]
-            registry.add_account(acc)
+            for row in data:
+                acc = AccountPersonal(
+                    row["first_name"],
+                    row["last_name"],
+                    row["pesel"]
+                )
+                acc.balance = row.get("balance", 0)
+                acc.history = row.get("history", [])
+                registry.add_account(acc)
     
-        return registry
+            return registry
+
