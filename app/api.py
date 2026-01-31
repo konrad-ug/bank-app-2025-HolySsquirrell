@@ -132,18 +132,21 @@ def transfer_between_accounts():
 
     return jsonify({"message": "Transfer completed"}), 200
 
-mongo_repo = MongoAccountsRepository()
+def get_mongo_repo():
+    return MongoAccountsRepository()
 
 @app.route("/api/accounts/save", methods=['POST'])
 def save_accounts():
+    repo = get_mongo_repo()
     accounts = registry.return_all_accs()
-    mongo_repo.save_all(accounts)
+    repo.save_all(accounts)
     return {"message": "Accounts saved to DB"}, 200
-
+    
 @app.route("/api/accounts/load", methods=['POST'])
 def load_accounts():
     global registry
-    registry = mongo_repo.load_all()
+    repo = get_mongo_repo()
+    registry = repo.load_all()
     return {"message": "Accounts loaded from DB"}, 200
 
 
