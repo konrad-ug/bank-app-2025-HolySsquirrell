@@ -24,7 +24,7 @@ class MongoAccountsRepository(AccountsRepository):
         for acc in accounts:
             self._collection.update_one(
                 {"pesel": acc.pesel},
-                {"$set": acc.__dict__}, 
+                {"$set": acc.to_dict()}, 
                 upsert=True
             )
 
