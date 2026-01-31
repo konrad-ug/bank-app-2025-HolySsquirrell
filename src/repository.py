@@ -35,6 +35,7 @@ class MongoAccountsRepository(AccountsRepository):
         )
 
 
+
     def load_all(self):
         registry = AccountRegistry()
         registry.accounts.clear()
