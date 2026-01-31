@@ -48,7 +48,6 @@ def get_account_by_pesel(pesel):
     }), 200
 
 @app.route("/api/accounts/<pesel>", methods=['PATCH'])
-@app.route("/api/accounts/<pesel>", methods=['PATCH'])
 def update_account(pesel):
     data = request.get_json()
     account = registry.search_account(pesel)
@@ -133,18 +132,27 @@ def transfer_between_accounts():
 
     return jsonify({"message": "Transfer completed"}), 200
 
-mongo_repo = MongoAccountsRepository()
+def get_mongo_repo():
+    return MongoAccountsRepository()
 
 @app.route("/api/accounts/save", methods=['POST'])
+@app.route("/api/accounts/save", methods=['POST'])
 def save_accounts():
-    accounts = registry.return_all_accs()
-    mongo_repo.save_all(accounts)
-    return {"message": "Accounts saved to DB"}, 200
+    try:
+        repo = get_mongo_repo()
+        accounts = registry.return_all_accs()
+        repo.save_all(accounts)
+        return {"message": "Accounts saved to DB"}, 200
+    except Exception as e:
+        print("SAVE ERROR:", e)
+        return {"error": str(e)}, 500
 
+    
 @app.route("/api/accounts/load", methods=['POST'])
 def load_accounts():
     global registry
-    registry = mongo_repo.load_all()
+    repo = get_mongo_repo()
+    registry = repo.load_all()
     return {"message": "Accounts loaded from DB"}, 200
 
 

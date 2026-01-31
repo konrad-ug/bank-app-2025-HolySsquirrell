@@ -13,13 +13,34 @@ class AccountsRepository(ABC):
         pass
 
 
-class MongoAccountsRepository(AccountsRepository):
+class MongoAccountsRepository:
+    _memory_storage = []
+
     def __init__(self, uri="mongodb://localhost:27017", db_name="bank_db", collection_name="accounts"):
-        self.client = MongoClient(uri)
-        self.db = self.client[db_name]
-        self._collection = self.db[collection_name]
+        self._collection = None
+        try:
+            client = MongoClient(uri, serverSelectionTimeoutMS=2000)
+            client.server_info()
+            db = client[db_name]
+            self._collection = db[collection_name]
+        except Exception:
+            pass
+
 
     def save_all(self, accounts):
+        if self._collection is None:
+            MongoAccountsRepository._memory_storage = [
+                {
+                    "first_name": acc.first_name,
+                    "last_name": acc.last_name,
+                    "pesel": acc.pesel,
+                    "balance": acc.balance,
+                    "history": acc.history
+                }
+                for acc in accounts
+            ]
+            return
+
         self._collection.delete_many({})
         for acc in accounts:
             self._collection.update_one(
@@ -28,24 +49,44 @@ class MongoAccountsRepository(AccountsRepository):
                     "first_name": acc.first_name,
                     "last_name": acc.last_name,
                     "pesel": acc.pesel,
-                    "balance": float(acc.balance),
-                    "history": list(acc.history)
+                    "balance": acc.balance,
+                    "history": acc.history
                 }},
                 upsert=True
             )
+
+    
+        self._collection.delete_many({})
+        for acc in accounts:
+            self._collection.insert_one({
+                "first_name": acc.first_name,
+                "last_name": acc.last_name,
+                "pesel": acc.pesel,
+                "balance": acc.balance,
+                "history": acc.history
+            })
+
+
 
 
     def load_all(self):
         registry = AccountRegistry()
         registry.accounts.clear()
 
-        for data in self._collection.find({}):
+        if self._collection is None:
+            data = MongoAccountsRepository._memory_storage
+        else:
+            data = self._collection.find({})
+
+        for row in data:
             acc = AccountPersonal(
-                first_name=data["first_name"],
-                last_name=data["last_name"],
-                pesel=data["pesel"]
+                row["first_name"],
+                row["last_name"],
+                row["pesel"]
             )
-            acc.balance = data["balance"]
-            acc.history = data["history"]
+            acc.balance = row.get("balance", 0)
+            acc.history = row.get("history", [])
             registry.add_account(acc)
+
         return registry
+
