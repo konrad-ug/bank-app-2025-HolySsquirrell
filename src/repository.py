@@ -20,13 +20,20 @@ class MongoAccountsRepository(AccountsRepository):
         self._collection = self.db[collection_name]
 
     def save_all(self, accounts):
-        self._collection.delete_many({})
-        for acc in accounts:
-            self._collection.update_one(
-                {"pesel": acc.pesel},
-                {"$set": acc.to_dict()}, 
-                upsert=True
-            )
+    self._collection.delete_many({})
+    for acc in accounts:
+        self._collection.update_one(
+            {"pesel": acc.pesel},
+            {"$set": {
+                "first_name": acc.first_name,
+                "last_name": acc.last_name,
+                "pesel": acc.pesel,
+                "balance": float(acc.balance),
+                "history": list(acc.history)
+            }},
+            upsert=True
+        )
+
 
     def load_all(self):
         registry = AccountRegistry()
