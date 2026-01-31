@@ -24,9 +24,16 @@ class MongoAccountsRepository(AccountsRepository):
         for acc in accounts:
             self._collection.update_one(
                 {"pesel": acc.pesel},
-                {"$set": acc.__dict__}, 
+                {"$set": {
+                    "first_name": acc.first_name,
+                    "last_name": acc.last_name,
+                    "pesel": acc.pesel,
+                    "balance": float(acc.balance),
+                    "history": list(acc.history)
+                }},
                 upsert=True
             )
+
 
     def load_all(self):
         registry = AccountRegistry()
