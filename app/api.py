@@ -136,11 +136,17 @@ def get_mongo_repo():
     return MongoAccountsRepository()
 
 @app.route("/api/accounts/save", methods=['POST'])
+@app.route("/api/accounts/save", methods=['POST'])
 def save_accounts():
-    repo = get_mongo_repo()
-    accounts = registry.return_all_accs()
-    repo.save_all(accounts)
-    return {"message": "Accounts saved to DB"}, 200
+    try:
+        repo = get_mongo_repo()
+        accounts = registry.return_all_accs()
+        repo.save_all(accounts)
+        return {"message": "Accounts saved to DB"}, 200
+    except Exception as e:
+        print("SAVE ERROR:", e)
+        return {"error": str(e)}, 500
+
     
 @app.route("/api/accounts/load", methods=['POST'])
 def load_accounts():
