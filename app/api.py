@@ -48,7 +48,6 @@ def get_account_by_pesel(pesel):
     }), 200
 
 @app.route("/api/accounts/<pesel>", methods=['PATCH'])
-@app.route("/api/accounts/<pesel>", methods=['PATCH'])
 def update_account(pesel):
     data = request.get_json()
     account = registry.search_account(pesel)
