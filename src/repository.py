@@ -13,19 +13,18 @@ class AccountsRepository(ABC):
         pass
 
 
-class MongoAccountsRepository(AccountsRepository):
+class MongoAccountsRepository:
     _memory_storage = []
 
     def __init__(self, uri="mongodb://localhost:27017", db_name="bank_db", collection_name="accounts"):
+        self._collection = None
         try:
-            self.client = MongoClient(uri, serverSelectionTimeoutMS=2000)
-            self.client.server_info()  # wymusza połączenie
-            self.db = self.client[db_name]
-            self._collection = self.db[collection_name]
-            self.use_memory = False
+            client = MongoClient(uri, serverSelectionTimeoutMS=2000)
+            client.server_info()
+            db = client[db_name]
+            self._collection = db[collection_name]
         except Exception:
-            # fallback na pamięć
-            self.use_memory = True
+            pass
 
 
     def save_all(self, accounts):
