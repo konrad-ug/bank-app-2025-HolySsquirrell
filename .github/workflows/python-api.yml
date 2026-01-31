@@ -39,6 +39,8 @@ jobs:
         export FLASK_ENV=development
         flask run &
         sleep 3  # wait for server to start
+    - name: start mongo
+      run: docker compose -f mongo.yml up -d
 
     - name: Run API tests
       run: python -m pytest tests/api
